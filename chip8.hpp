@@ -1,18 +1,24 @@
 #include <stdint.h>
 #include <chrono>
 #include <random>
+#include <string.h>
 
 class CPU{
 
 	public:
 
 		void LoadROM(char const* filename);
-		CPU()
-		{
-			
-		
-
+		void Cycle();
+		void OP_00E0(){
+			memset(video_buffer,0,sizeof(video_buffer));
 		};
+		void OneNNN(){
+			pc = opcode & 0x0FFFu; 
+		};
+		void SixXNN();
+		void SevenXNN();
+		void ANNN();
+		void DXYN();
 
 		uint8_t fontset[80] = {
 	0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -33,25 +39,26 @@ class CPU{
 	0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
-		
-		std::uniform_int_distribution<uint8_t> randByte;
+		private:
+			std::uniform_int_distribution<uint8_t> randByte;
 
-		//input keys and display memory
-		uint8_t input[16]{};
-		uint32_t video_buffer[64*32];
-		
-		/*registers,memory,stack,stack_pointer,program_counter
-			delaytimer,soundtimer,opcodes			*/
-		
-		uint8_t registers[16]{};
-		uint8_t memory[4096]{};
-		uint16_t index_register{};
-		uint16_t pc{};
-		uint16_t stack[16]{};
-		uint8_t sp{};
-		uint8_t timer{};
-		uint8_t soundtimer{};
-		uint16_t opcode{};
+			//input keys and display memory
+			uint8_t input[16]{};
+			uint32_t video_buffer[64*32];
+			
+			/*registers,memory,stack,stack_pointer,program_counter
+				delaytimer,soundtimer,opcodes			*/
+			
+			uint8_t registers[16];
+			uint8_t memory[4096];
+			uint16_t index_register;
+			uint16_t pc;
+			uint16_t stack[16];
+			uint8_t sp;
+			uint8_t timer;
+			uint8_t soundtimer;
+			uint16_t opcode;
+
 };
 
 

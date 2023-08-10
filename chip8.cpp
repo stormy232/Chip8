@@ -9,9 +9,7 @@ const unsigned int FONTSET_START_ADDRESS = 0x50;
 CPU::CPU(){
 
 	pc = START_ADDRESS;
-
-		unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-		:randGen(seed)
+    
 	for(unsigned int i =0; i < 80; ++i){
 
 		memory[FONTSET_START_ADDRESS + i] = fontset[i]; 
@@ -20,6 +18,12 @@ CPU::CPU(){
 
 }
 
+void CPU::Cycle(){
+	opcode =  (memory[pc] << 8) | memory[pc+1];
+	pc += 2;
+
+	
+}
 
 void CPU::LoadROM(char const* filename){
 

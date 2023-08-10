@@ -1,2 +1,2 @@
-chip8:chip8.cpp
-	g++ chip8.cpp -o chip8 
+all:
+	g++ -I src/include -L src/lib -o main main.cpp -lmingw32 -lSDL2main -lsDl2
