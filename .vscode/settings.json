@@ -46,6 +46,16 @@
         "ostream": "cpp",
         "stdexcept": "cpp",
         "streambuf": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "charconv": "cpp",
+        "optional": "cpp",
+        "format": "cpp",
+        "iomanip": "cpp",
+        "iostream": "cpp",
+        "span": "cpp",
+        "sstream": "cpp",
+        "cinttypes": "cpp",
+        "variant": "cpp",
+        "bitset": "cpp"
     }
 }

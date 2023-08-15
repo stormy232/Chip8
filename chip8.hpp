@@ -6,19 +6,49 @@
 class CPU{
 
 	public:
-
+		CPU();
 		void LoadROM(char const* filename);
+		void decode();
 		void Cycle();
 		void OP_00E0(){
+			//clears screen (here we set video buffer to 0)
 			memset(video_buffer,0,sizeof(video_buffer));
-		};
+		}
 		void OneNNN(){
-			pc = opcode & 0x0FFFu; 
+			//gets the pc to jump to an address
+			uint16_t address = opcode & 0x0FFFu; 
+			pc = address;
+		}
+		void SIXXNN(){
+			//sets register vx to a value
+			uint8_t value = opcode & 0x00FF;
+			uint8_t vx = (opcode & 0x0F00) >> 8;
+			registers[vx] = value;
+		}
+		void SevenXNN(){
+			//adds a value to register vx			
+			uint8_t value = opcode & 0x00FF;
+			uint8_t vx = (opcode & 0x0F00) >> 8;
+			registers[vx] += value;
 		};
-		void SixXNN();
-		void SevenXNN();
-		void ANNN();
-		void DXYN();
+		void ANNN(){
+			uint16_t byte3 = opcode & 0x0FFF;
+			index_register = byte3;
+		};
+		void DXYN(){
+			uint8_t vx = (opcode & 0x0F00) >> 8;
+			uint8_t vy = (opcode & 0x00F0) >> 4;
+			uint8_t height = (opcode & 0x000F);
+
+			uint8_t x_pos = registers[vx] % MAX_HEIGHT;
+			uint8_t y_pos = registers[vy] % MAX_WIDTH;
+
+			registers[15] = 0;
+
+			for(int row=0; row<height; ++row){
+			
+			}
+		};
 
 		uint8_t fontset[80] = {
 	0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -40,8 +70,10 @@ class CPU{
 };
 
 		private:
-			std::uniform_int_distribution<uint8_t> randByte;
+			const uint8_t MAX_WIDTH = 64;
+			const uint8_t MAX_HEIGHT = 32;
 
+			std::uniform_int_distribution<uint8_t> randByte;
 			//input keys and display memory
 			uint8_t input[16]{};
 			uint32_t video_buffer[64*32];
