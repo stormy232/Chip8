@@ -21,7 +21,7 @@ CPU::CPU(){
 
 void CPU::LoadROM(char const* filename){
 
-	std::ifstream file("ibm.ch8", std::ios::binary | std::ios::ate);
+	std::ifstream file(filename, std::ios::binary | std::ios::ate);
 
 	if(file.is_open()){
 
@@ -40,71 +40,59 @@ void CPU::LoadROM(char const* filename){
 			memory[START_ADDRESS + i] = buffer[i];		
 
 		}
+
+		std::cout << memory[514];
 		//Free the buffer
 		delete[] buffer;
-
+		
 	}
 }
 
 void CPU::Cycle(){
 	opcode =  (memory[pc] << 8) | memory[pc+1];
 	pc += 2;
-
+	std::cout << pc << " ";
 	switch(opcode & 0xF000){
 		case 0x0000:
 			OP_00E0();
+			std::cout << "00E0" << '\n';
 			break;
 		case 0x1000:
 			OneNNN();
+			std::cout << "1NNN" << '\n';  
 			break;
 		case 0x6000:
 			SIXXNN();
+			std::cout << "6XNN" << '\n';
 			break;
 		case 0x7000:
 			SevenXNN();
+			std::cout << "7XNN" << '\n';
 			break;
 		case 0xA000:
 			ANNN();
+			std::cout << "ANNN" << '\n';
 			break;
 		case 0xD000:
-			//DXYN();
-			break;
+			DXYN();
+			std::cout << "DXYN" << '\n';
 	}
 
 	
 }
 
+void update(){
+	
+}
 
 int main(int argc, char* argv[]){
 
- SDL_Init( SDL_INIT_EVERYTHING );
+CPU cats;
+char const* romFilename = argv[0];
+int videopitch = sizeof(cats.video_buffer[0]) * cats.MAX_WIDTH;
 
-    SDL_Window *window = SDL_CreateWindow( "Hello SDL World", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 600, 800, SDL_WINDOW_ALLOW_HIGHDPI );
-    
-    // Check that the window was successfully created
-    if ( NULL == window )
-    {
-        // In the case that the window could not be made...
-        std::cout << "Could not create window: " << SDL_GetError( ) << std::endl;
-        return 1;
-    }
-    
-    SDL_Event windowEvent;
-    
-    while ( true )
-    {
-        if ( SDL_PollEvent( &windowEvent ) )
-        {
-            if ( SDL_QUIT == windowEvent.type )
-            {
-                break;
-            }
-        }
-    }
-    
-    SDL_DestroyWindow( window );
-    SDL_Quit( );
-    
+cats.LoadROM(romFilename);
+cats.Cycle();
     return EXIT_SUCCESS;
 	}
 	

@@ -46,9 +46,31 @@ class CPU{
 			registers[15] = 0;
 
 			for(int row=0; row<height; ++row){
-			
+				uint8_t spriteByte = memory[index_register + row];
+				for(unsigned int col = 0; col < 8; ++col)
+				{
+					uint8_t spritepixel = spriteByte & (0x80 >> col);
+					uint32_t * screenpixel = &video_buffer[(y_pos + row) * MAX_WIDTH + (x_pos + col)];
+					// Sprite pixel is on
+				if (spritepixel)
+				{
+				// Screen pixel also on - collision
+				if (*screenpixel == 0xFFFFFFFF)
+				{
+					registers[0xF] = 1;
+				}
+
+				// Effectively XOR with the sprite pixel
+				*screenpixel ^= 0xFFFFFFFF;
 			}
-		};
+		}
+	
+
+
+				}
+
+			}
+		
 
 		uint8_t fontset[80] = {
 	0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -69,7 +91,7 @@ class CPU{
 	0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
-		private:
+	
 			const uint8_t MAX_WIDTH = 64;
 			const uint8_t MAX_HEIGHT = 32;
 
@@ -80,7 +102,7 @@ class CPU{
 			
 			/*registers,memory,stack,stack_pointer,program_counter
 				delaytimer,soundtimer,opcodes			*/
-			
+	private:		
 			uint8_t registers[16];
 			uint8_t memory[4096];
 			uint16_t index_register;
