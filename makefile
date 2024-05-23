@@ -1,2 +1,2 @@
 main:chip8.cpp
-	g++ -I src/include -L src/lib -o main main.cpp -lmingw32 -lSDL2main -lsDl2
+	g++ -o main chip8.cpp `sdl2-config --cflags --libs`

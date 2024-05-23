@@ -1,33 +1,36 @@
-#include<iostream>
 #include <SDL2/SDL.h>
+#include <iostream>
 
-const int WIDTH = 500, HEIGHT = 100;
-
-int main(int argc, char *argv[]){
-
-SDL_Init(SDL_INIT_EVERYTHING);
-
-SDL_Window *window = SDL_CreateWindow("Hello SDL World", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_ALLOW_HIGHDPI);
-
-if (NULL == window){
-
-    std::cout << "ERROR HAS OCCURED WITH CREATING A WINDOW" << SDL_GetError() << '\n';
-    return 1;
-}
-
-SDL_Event windowEvent;
-
-    while (true){
-        if(SDL_PollEvent(&windowEvent)){
-            if(SDL_QUIT == windowEvent.type){
-                break;
-            }
-        }
+int main()
+{
+    if(SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
+        std::cout << "Failed to initialize the SDL2 library\n";
+        return -1;
     }
 
-SDL_DestroyWindow(window);
-SDL_Quit();;
+    SDL_Window *window = SDL_CreateWindow("SDL2 Window",
+                                          SDL_WINDOWPOS_CENTERED,
+                                          SDL_WINDOWPOS_CENTERED,
+                                          680, 480,
+                                          0);
 
-return EXIT_SUCCESS;
+    if(!window)
+    {
+        std::cout << "Failed to create window\n";
+        return -1;
+    }
 
-} 
+    SDL_Surface *window_surface = SDL_GetWindowSurface(window);
+
+    if(!window_surface)
+    {
+        std::cout << "Failed to get the surface from the window\n";
+        return -1;
+    }
+
+    SDL_UpdateWindowSurface(window);
+
+    SDL_Delay(5000);
+}
+
