@@ -90,6 +90,7 @@ int main(int argc, char *argv[]) {
 
   cats.LoadROM(romFilename);
   for (int i = 0; i < 5; i++) {
+    std::cout << i;
     cats.Cycle();
   }
   update(cats);
