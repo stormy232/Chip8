@@ -17,31 +17,44 @@ class CPU{
 		void ANNN();
 		void DXYN();
 			
+		uint8_t fontset[80] = { 0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+	0x20, 0x60, 0x20, 0x20, 0x70, // 1
+	0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
+	0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
+	0x90, 0x90, 0xF0, 0x10, 0x10, // 4
+	0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
+	0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
+	0xF0, 0x10, 0x20, 0x40, 0x40, // 7
+	0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
+	0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
+	0xF0, 0x90, 0xF0, 0x90, 0x90, // A
+	0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
+	0xF0, 0x80, 0x80, 0x80, 0xF0, // C
+	0xE0, 0x90, 0x90, 0x90, 0xE0, // D
+	0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
+	0xF0, 0x80, 0xF0, 0x80, 0x80  // F  
+    };
 
+		const uint8_t MAX_WIDTH = 64;
+		const uint8_t MAX_HEIGHT = 32;
 
-		uint8_t fontset[80];  
-
-	
-			const uint8_t MAX_WIDTH = 64;
-			const uint8_t MAX_HEIGHT = 32;
-
-			std::uniform_int_distribution<uint8_t> randByte;
+		std::uniform_int_distribution<uint8_t> randByte;
 			//input keys and display memory
-			uint8_t input[16]{};
-			uint32_t video_buffer[64*32];
+		uint8_t input[16]{};
+		uint32_t video_buffer[64*32];
 			
 			/*registers,memory,stack,stack_pointer,program_counter
 				delaytimer,soundtimer,opcodes			*/
-	private:		
-			uint8_t registers[16];
-			uint8_t memory[4096];
-			uint16_t index_register;
-			uint16_t pc;
-			uint16_t stack[16];
-			uint8_t sp;
-			uint8_t timer;
-			uint8_t soundtimer;
-			uint16_t opcode;
+	 private:		
+		uint8_t registers[16];
+		uint8_t memory[4096];
+		uint16_t index_register;
+		uint16_t pc;
+		uint16_t stack[16];
+		uint8_t sp;
+		uint8_t timer;
+		uint8_t soundtimer;
+		uint16_t opcode;
 
 };
 

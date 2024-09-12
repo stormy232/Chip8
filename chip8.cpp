@@ -3,6 +3,9 @@
 #include <fstream>
 #include <iostream>
 #include <unistd.h>
+#include <climits>
+#include <chrono>
+#include <thread>
 
 const unsigned int START_ADDRESS = 0x200;
 const unsigned int FONTSET_START_ADDRESS = 0x50;
@@ -76,9 +79,17 @@ void CPU::Cycle() {
 }
 
 void update(CPU cpu) {
-  for (int i = 0; i < sizeof(cpu.video_buffer) / sizeof(cpu.video_buffer[0]);
-       i++) {
-    std::cout << cpu.video_buffer[i];
+  for (int i = 0; i < 32; i++) {
+    std::cout << '\n';
+    for (int j = 0; j < 64; j++) {
+    int x = cpu.video_buffer[j+64*i];
+    if(x == UINT_MAX){
+      std::cout << '|';
+    }
+    else {
+      std::cout << x; 
+    }
+    } 
   }
 }
 
@@ -89,10 +100,10 @@ int main(int argc, char *argv[]) {
   int videopitch = sizeof(cats.video_buffer[0]) / sizeof(int) * cats.MAX_WIDTH;
 
   cats.LoadROM(romFilename);
-  for (int i = 0; i < 5; i++) {
-    std::cout << i;
+  while (true) { 
     cats.Cycle();
+    update(cats);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
   }
-  update(cats);
-  return EXIT_SUCCESS;
+  return 1;
 }
