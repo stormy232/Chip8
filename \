@@ -16,10 +16,10 @@ void Initalize_window(int scale, CPU &cats){
     renderer = SDL_CreateRenderer(window,0,0);
 
     SDL_RenderSetScale(renderer,1,1);
+    SDL_Event event;
     bool quit = true; 
 
-    while (quit == true){
-      SDL_Event e;
+    while (quit){
       SDL_SetRenderDrawColor(renderer,0,0,0,255);    
       SDL_RenderClear(renderer);
       SDL_SetRenderDrawColor(renderer,255,255,255,255);
@@ -33,12 +33,11 @@ void Initalize_window(int scale, CPU &cats){
     }
 
    SDL_RenderPresent(renderer);
-   cats.Cycle();
 
-   while (SDL_PollEvent(&e)) {
-     if (e.type == SDL_QUIT) {
-       quit = false;
+   while (SDL_PollEvent(&event)) {
+     if (event.type == SDL_QUIT) {
        break;
+       quit = false;
      }
    }
 
