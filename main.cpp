@@ -15,7 +15,7 @@ void Initalize_window(int scale, CPU &cats){
     window = SDL_CreateWindow("Tester",0,0,800,600,SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window,0,0);
 
-    SDL_RenderSetScale(renderer,10,10);
+    SDL_RenderSetScale(renderer,10,15);
     bool quit = true; 
 
     while (quit == true){
