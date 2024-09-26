@@ -15,7 +15,7 @@ void Initalize_window(int scale, CPU &cats){
     window = SDL_CreateWindow("Tester",0,0,800,600,SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window,0,0);
 
-    SDL_RenderSetScale(renderer,1,1);
+    SDL_RenderSetScale(renderer,10,10);
     bool quit = true; 
 
     while (quit == true){
@@ -26,7 +26,7 @@ void Initalize_window(int scale, CPU &cats){
     
     for (int i=0; i<32; i++) {  
       for (int j = 0; j<64; j++) {
-        if (cats.video_buffer[i*32+j] != 0){
+        if (cats.video_buffer[i*64+j] != 0){
         SDL_RenderDrawPoint(renderer,j,i);
         }
       }
@@ -42,7 +42,8 @@ void Initalize_window(int scale, CPU &cats){
      }
    }
 
-    }
+   SDL_Delay(500);
+ }
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();

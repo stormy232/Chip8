@@ -1,7 +1,5 @@
 #include <stdint.h>
-#include <chrono>
 #include <random>
-#include <string.h>
 #include "chip8.hpp"
 #include <iostream>
 #include <fstream>
@@ -37,16 +35,19 @@
 			uint8_t vy = (opcode & 0x00F0) >> 4;
 			uint8_t height = (opcode & 0x000F);
 
-			uint8_t x_pos = registers[vx] % MAX_HEIGHT;
-			uint8_t y_pos = registers[vy] % MAX_WIDTH;
+			uint8_t x_pos = registers[vx] % MAX_WIDTH;
+			uint8_t y_pos = registers[vy] % MAX_HEIGHT;
+
+      std::cout << "The X and y pos are " << +registers[vx] << ',' << +registers[vy] << '\n';
 
 			registers[15] = 0;
 
-			for(int row=0; row<height; ++row){
+			for(int row=0; row<height; row++){
 				uint8_t spriteByte = memory[index_register + row];
-				for(unsigned int col = 0; col < 8; ++col)
+				for(int col = 0; col < 8; col++)
 				{
-					uint8_t spritepixel = spriteByte & (0x80 >> col);
+          if (x_pos+col > MAX_WIDTH) {break;}
+					uint8_t spritepixel = spriteByte & (0x80 >> col); //0x80 = 10000000 shift over by whatever collumn we're on to get current bit needed for screenpixel
 					uint32_t * screenpixel = &video_buffer[(y_pos + row) * MAX_WIDTH + (x_pos + col)];
 					// Sprite pixel is on
 				if (spritepixel)
