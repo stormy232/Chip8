@@ -16,6 +16,35 @@ class CPU{
 		void SevenXNN();
 		void ANNN();
 		void DXYN();
+    void OP_00EE();
+    void OP_2NNN();
+    void OP_3XNN();
+    void OP_4XNN();
+    void OP_5XY0();
+    void OP_9XY0();
+    void OP_8XY0();
+    void OP_8XY1();
+    void OP_8XY2();
+    void OP_8XY3();
+    void OP_8XY4();
+    void OP_8XY5();
+    void OP_8XY7();
+    void OP_8XY6();
+    void OP_8XYE();
+    void OP_BNNN();
+    void OP_CXNN();
+    void OP_EX9E();
+    void OP_FX07();
+    void OP_FX15();
+    void OP_FX18();
+    void OP_FX1E();
+    void OP_FX0A();
+    void OP_FX29();
+    void OP_FX33();
+    void OP_FX55();
+    void OP_FX65();
+    void OP_EXA1();
+
 			
 		uint8_t fontset[80] = { 0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
 	0x20, 0x60, 0x20, 0x20, 0x70, // 1
