@@ -1,7 +1,8 @@
 #include "chip8.hpp"
+#include <iostream>
 #include <SDL2/SDL.h>
 
-int GetKey(){
+uint8_t GetKey(){
 SDL_Event e;
 while (SDL_PollEvent(&e)) {
     switch (e.type){
@@ -45,16 +46,16 @@ while (SDL_PollEvent(&e)) {
 }
 return -1;
 }
-void CPU::OP_EX93(){
+void CPU::OP_EX9E(){
   uint8_t VX = registers[(opcode & 0xF00) >> 8];
-  if (GetKey == VX){
+  if (GetKey() == VX){
     pc += 2; 
   }
 }
 
-void CPU::OP_EX93(){
+void CPU::OP_EXA1(){
   uint8_t VX = registers[(opcode & 0xF00) >> 8];
-  if (GetKey != VX){
+  if (GetKey() != VX){
     pc += 2; 
   }
 }
@@ -64,7 +65,7 @@ void CPU::OP_FX0A(){
   pc -= 2; 
  }
  else {
-  uint8_t *VX = registers[(opcode & 0xF00) >> 8];
+  uint8_t *VX = &registers[(opcode & 0xF00) >> 8];
   *VX=GetKey();
  }
 }

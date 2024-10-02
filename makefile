@@ -1,4 +1,5 @@
-main:main.cpp cpu.cpp
+main:main.cpp cpu.cpp input.cpp
 	g++ -c cpu.cpp
 	g++ -c main.cpp
-	g++ cpu.o main.o -o main `sdl2-config --cflags --libs`
+	g++ -c input.cpp
+	g++ cpu.o main.o input.o -o main `sdl2-config --cflags --libs`

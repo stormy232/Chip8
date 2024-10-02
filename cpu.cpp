@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <chrono>
 #include <random>
 #include "chip8.hpp"
 #include <iostream>
@@ -198,6 +199,54 @@
     registers[15] = *VX & 0b10000000; 
     *VX << 1;
   }
+
+  void CPU::OP_FX07(){
+    uint8_t *VX = &registers[(opcode & 0x0F00) >> 8];
+    *VX=timer; 
+  }
+
+  void CPU::OP_FX15(){
+    uint8_t *VX = &registers[(opcode & 0x0F00) >> 8];
+    timer=*VX; 
+  }
+
+  void CPU::OP_FX18(){
+    uint8_t *VX = &registers[(opcode & 0x0F00) >> 8];
+    soundtimer=*VX; 
+  }
+
+  void CPU::OP_FX1E(){
+    uint8_t *VX = &registers[(opcode & 0x0F00) >> 8];
+    index_register+=*VX;
+  }
+  
+  void CPU::OP_FX29(){
+    uint8_t *VX = &registers[(opcode & 0x0F00) >> 8];
+    index_register = 0x50+5*(*VX);
+  }
+
+  void CPU::OP_FX33(){
+  uint8_t VX = registers[(opcode & 0x0F00) >> 8];
+  for(int i =0; i<3; i++){
+    memory[index_register+2-i] = VX%10;
+    VX=VX/10;
+  }    
+}
+
+void CPU::OP_FX55(){
+  uint8_t VX = (opcode & 0x0F00) >> 8;
+  for(int i = 0; i<=VX; i++){
+    memory[index_register+i] = registers[i];
+  }
+}
+
+void CPU::OP_FX65(){
+  uint8_t VX = (opcode & 0x0F00) >> 8;
+  for(int i = 0; i<=VX; i++){
+    registers[i] = memory[index_register+i];
+  }
+}
+
 const unsigned int START_ADDRESS = 0x200;
 const unsigned int FONTSET_START_ADDRESS = 0x50;
 
@@ -237,7 +286,7 @@ void CPU::LoadROM(char const *filename) {
     delete[] buffer;
   }
 }
-
+auto start = std::chrono::high_resolution_clock::now();
 void CPU::Cycle() {
   opcode = (memory[pc] << 8) | memory[pc + 1];
   pc += 2;
@@ -267,4 +316,14 @@ void CPU::Cycle() {
     DXYN();
     std::cout << "DXYN" << '\n';
   }
+  auto stop = std::chrono::high_resolution_clock::now();
+  auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop-start);
+
+  if (soundtimer > 0){
+    soundtimer -= duration.count()*60;
+  }
+  if (timer > 0) {
+    timer -= duration.count()*60;
+  }
+  start = stop;
 }
