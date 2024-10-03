@@ -3,43 +3,44 @@
 #include <SDL2/SDL.h>
 
 uint8_t GetKey(){
+SDL_PumpEvents();
 SDL_Event e;
 while (SDL_PollEvent(&e)) {
     switch (e.type){
       case (SDL_KEYDOWN):
-        std::cout << e.key.keysym.sym << '\n';
+        std::cout << "Key Pressed";
         switch (e.key.keysym.sym){
-          case(48): 
+          case(SDLK_1): 
             return 0x0;
-          case(49): 
+          case(SDLK_2): 
             return 0x1;
-          case(50): 
+          case(SDLK_3): 
             return 0x2;
-          case(51): 
+          case(SDLK_4): 
             return 0x3;
-          case(52): 
+          case(SDLK_q): 
             return 0x4;
-          case(53): 
+          case(SDLK_w): 
             return 0x5;
-          case(54): 
+          case(SDLK_e): 
             return 0x6;
-          case(55): 
+          case(SDLK_r): 
             return 0x7;
-          case(56): 
+          case(SDLK_a): 
             return 0x8;
-          case(57): 
+          case(SDLK_s): 
             return 0x9;
-          case(97): 
+          case(SDLK_d): 
             return 0xA;
-          case(98): 
+          case(SDLK_f): 
             return 0xB;
-          case(99): 
+          case(SDLK_z): 
             return 0xC;
-          case(100): 
+          case(SDLK_x): 
             return 0xD;
-          case(101): 
+          case(SDLK_c): 
             return 0xE;
-          case(102): 
+          case(SDLK_v): 
             return 0xF;
     }
   }

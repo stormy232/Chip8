@@ -72,6 +72,8 @@ class CPU{
 		uint8_t input[16]{};
 		uint32_t video_buffer[64*32];
 			
+		uint8_t timer;
+		uint8_t soundtimer;
 			/*registers,memory,stack,stack_pointer,program_counter
 				delaytimer,soundtimer,opcodes			*/
 	 private:		
@@ -81,8 +83,6 @@ class CPU{
 		uint16_t pc;
 		uint16_t stack[16];
 		uint8_t sp;
-		uint8_t timer;
-		uint8_t soundtimer;
 		uint16_t opcode;
 
 };

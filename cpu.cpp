@@ -4,6 +4,8 @@
 #include "chip8.hpp"
 #include <iostream>
 #include <fstream>
+#include <time.h> 
+#include <cstdlib>
 
 
 	void CPU::OP_00E0(){
@@ -12,31 +14,38 @@
 		}
 		void CPU::OneNNN(){
 			//gets the pc to jump to an address
-			uint16_t address = opcode & 0x0FFFu; 
+			uint16_t address = opcode & 0xFFFu; 
 			pc = address;
 		}
 		void CPU::SIXXNN(){
 			//sets register vx to a value
-			uint8_t value = opcode & 0x00FF;
+			uint8_t value = opcode & 0xFF;
 			uint8_t vx = (opcode & 0x0F00) >> 8;
 			registers[vx] = value;
 		}
 		void CPU::SevenXNN(){
 			//adds a value to register vx			
-			uint8_t value = opcode & 0x00FF;
+			uint8_t value = opcode & 0xFF;
 			uint8_t vx = (opcode & 0x0F00) >> 8;
 			registers[vx] += value;
 		};
 		void CPU::ANNN(){
       //sets index register to value NNN (last 3 nibbles)
-			uint16_t byte3 = opcode & 0x0FFF;
+			uint16_t byte3 = opcode & 0xFFF;
 			index_register = byte3;
 		};
     
     void CPU::OP_BNNN(){
       //jumps to address NNN + value in V0
       //TODO: Add configuration to switch between this function definition and one that instead adds VX to address NNN (started with CHIP-48 and SUPER-CHIP)
-      pc = (opcode & 0x0FFF) + registers[0];
+      pc = (opcode & 0xFFF) + registers[0];
+    }
+
+    void CPU::OP_CXNN(){
+			uint8_t *vx = &registers[(opcode & 0x0F00) >> 8];
+      srand(time(0));
+      int random = rand() % 256;
+      *vx=random & (opcode & 0xFF);
     }
 		void CPU::DXYN(){
       //Draw Function
@@ -91,9 +100,9 @@
 
   void CPU::OP_00EE(){
     //Return back to courotine (like a break)
+    stack[sp] = 0x00;
     --sp;
     pc = stack[sp];
-    stack[sp] = 0x00;
   }
 
   void CPU::OP_3XNN(){
@@ -188,7 +197,9 @@
     uint8_t VY = registers[(opcode & 0x00F0) >> 4];
     *VX=VY;
     registers[15] = *VX & 0b10000000; 
-    *VX >> 1;
+    std::cout << unsigned(VY) << ":";
+    *VX >>= 1;
+    std::cout << unsigned(*VX) << " ";
   }
 
   void CPU::OP_8XYE(){
@@ -197,7 +208,9 @@
     uint8_t VY = registers[(opcode & 0x00F0) >> 4];
     *VX=VY;
     registers[15] = *VX & 0b10000000; 
-    *VX << 1;
+    std::cout << unsigned(VY) << ":";
+    *VX <<= 1;
+    std::cout << unsigned(*VX) << " ";
   }
 
   void CPU::OP_FX07(){
@@ -216,8 +229,8 @@
   }
 
   void CPU::OP_FX1E(){
-    uint8_t *VX = &registers[(opcode & 0x0F00) >> 8];
-    index_register+=*VX;
+    uint8_t VX = registers[(opcode & 0x0F00) >> 8];
+    index_register+=VX;
   }
   
   void CPU::OP_FX29(){
@@ -253,6 +266,7 @@ const unsigned int FONTSET_START_ADDRESS = 0x50;
 CPU::CPU() {
 
   pc = START_ADDRESS;
+	memset(video_buffer,0,sizeof(video_buffer));
 
   for (unsigned int i = 0; i < 80; ++i) {
 
@@ -286,44 +300,164 @@ void CPU::LoadROM(char const *filename) {
     delete[] buffer;
   }
 }
-auto start = std::chrono::high_resolution_clock::now();
 void CPU::Cycle() {
   opcode = (memory[pc] << 8) | memory[pc + 1];
   pc += 2;
-  std::cout << pc << " ";
+  std::cout << pc << ": ";
   switch (opcode & 0xF000) {
   case 0x0000:
-    OP_00E0();
-    std::cout << "00E0" << '\n';
+    switch (opcode & 0xF){
+      case 0:
+        OP_00E0();
+        std::cout << "00E0";
+        break;
+      case 0xE:
+        OP_00EE();
+        std::cout << "00EE";
+        break;
+    }
     break;
   case 0x1000:
     OneNNN();
-    std::cout << "1NNN" << '\n';
+    std::cout << "1NNN";
+    break;
+  case 0x2000:
+    OP_2NNN();
+    std::cout << "2NNN";
+    break;
+  case 0x3000:
+    OP_3XNN();
+    std::cout << "3XNN";
+    break;
+  case 0x4000:
+    OP_4XNN();
+    std::cout << "4XNN";
+    break;
+  case 0x5000:
+    OP_5XY0();
+    std::cout << "5XY0";
     break;
   case 0x6000:
     SIXXNN();
-    std::cout << "6XNN" << '\n';
+    std::cout << "6XNN";
     break;
   case 0x7000:
     SevenXNN();
-    std::cout << "7XNN" << '\n';
+    std::cout << "7XNN";
+    break;
+  case 0x8000:
+    switch(opcode & 0x000F){
+      case 0:
+        OP_8XY0();
+        std::cout << "8XY0";
+        break;
+      case 1:
+        OP_8XY1();
+        std::cout << "8XY1";
+        break;
+      case 2:
+        OP_8XY2();
+        std::cout << "8XY2";
+        break;
+      case 3:
+        OP_8XY3();
+        std::cout << "8XY3";
+        break;
+      case 4:
+        OP_8XY4();
+        std::cout << "8XY4";
+        break;
+      case 5:
+        OP_8XY5();
+        std::cout << "8XY5";
+        break;
+      case 6:
+        OP_8XY6();
+        std::cout << "8XY6";
+        break;
+      case 7:
+        OP_8XY7();
+        std::cout << "8XY7";
+        break;
+      case 0xE:
+        OP_8XYE();
+        std::cout << "8XYE";
+        break;
+    }
+    break;
+  case 0x9000:
+    OP_9XY0();
+    std::cout << "9XY0";
     break;
   case 0xA000:
     ANNN();
-    std::cout << "ANNN" << '\n';
+    std::cout << "ANNN";
+    break;
+  case 0xB000:
+    OP_BNNN();
+    std::cout << "BNNN";
+    break;
+  case 0xC000:
+    OP_CXNN();
+    std::cout << "CXNN";
     break;
   case 0xD000:
     DXYN();
-    std::cout << "DXYN" << '\n';
+    std::cout << "DXYN";
+    break;
+  case 0xE000:
+    switch(opcode & 0x000F){
+      case 1:
+        OP_EXA1();
+        std::cout << "EXA1";
+        break;
+      case 0xE:
+        OP_EX9E();
+        std::cout << "EX9E";
+        break;
+    }
+    break;
+  case 0xF000:
+    switch(opcode & 0xFF){
+      case 0x07:
+        OP_FX07();
+        std::cout << "FX07";
+        break;
+      case 0x15:
+        OP_FX15();
+        std::cout << "FX15";
+        break;
+      case 0x18:
+        OP_FX18();
+        std::cout << "FX18";
+        break;
+      case 0x1E:
+        OP_FX1E();
+        std::cout << "FX1E";
+        break;
+      case 0x0A:
+        OP_FX0A();
+        std::cout << "FX0A";
+        break;
+      case 0x29:
+        OP_FX29();
+        std::cout << "FX29";
+        break;
+      case 0x33:
+        OP_FX33();
+        std::cout << "FX33";
+        break;
+      case 0x55:
+        OP_FX55();
+        std::cout << "FX55";
+        break;
+      case 0x65:
+        OP_FX65();
+        std::cout << "FX65";
+        break;
+    }
+    break;
   }
-  auto stop = std::chrono::high_resolution_clock::now();
-  auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop-start);
+  std::cout << '\n';
 
-  if (soundtimer > 0){
-    soundtimer -= duration.count()*60;
-  }
-  if (timer > 0) {
-    timer -= duration.count()*60;
-  }
-  start = stop;
 }
