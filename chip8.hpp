@@ -74,6 +74,7 @@ class CPU{
 			
 		uint8_t timer;
 		uint8_t soundtimer;
+    uint8_t key;
 			/*registers,memory,stack,stack_pointer,program_counter
 				delaytimer,soundtimer,opcodes			*/
 	 private:		

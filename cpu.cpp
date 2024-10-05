@@ -303,7 +303,7 @@ void CPU::LoadROM(char const *filename) {
 void CPU::Cycle() {
   opcode = (memory[pc] << 8) | memory[pc + 1];
   pc += 2;
-  std::cout << pc << ": ";
+  std::cout << '\n' << pc << ": ";
   switch (opcode & 0xF000) {
   case 0x0000:
     switch (opcode & 0xF){
