@@ -22,3 +22,14 @@ The Following Project was therefore created in attempt to gain an understanding 
 ![Screenshot_20241020_183935](https://github.com/user-attachments/assets/09e9e30f-16fb-4e14-88a7-9e79cca33ac4)
 Breakout:
 ![Screenshot_20241020_183902](https://github.com/user-attachments/assets/92514e91-189d-42c1-b74b-025f260c41c9)
+
+Dependencies To Build:
+  -SDL2
+
+Build Instuctions:
+  #####
+    make clean & make
+
+How to Run Program:
+  #####
+    ./main [path_to_rom][width_of_window][height_of_window]
