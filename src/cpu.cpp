@@ -42,44 +42,41 @@
     }
 
     void CPU::OP_CXNN(){
-			uint8_t *vx = &registers[(opcode & 0x0F00) >> 8];
+      //Sets register VX to a bitwise AND Opertaion between a random 8bit unsigned integer and NN
+      uint8_t *vx = &registers[(opcode & 0x0F00) >> 8];
       srand(time(0));
       int random = rand() % 256;
       *vx=random & (opcode & 0xFF);
     }
-		void CPU::DXYN(){
+    void CPU::DXYN(){
       //Draw Function
-			uint8_t vx = (opcode & 0x0F00) >> 8;
-			uint8_t vy = (opcode & 0x00F0) >> 4;
-			uint8_t height = (opcode & 0x000F);
-
-			uint8_t x_pos = registers[vx] % MAX_WIDTH;
-			uint8_t y_pos = registers[vy] % MAX_HEIGHT;
+      uint8_t vx = (opcode & 0x0F00) >> 8;
+      uint8_t vy = (opcode & 0x00F0) >> 4;
+      uint8_t height = (opcode & 0x000F);
+      uint8_t x_pos = registers[vx] % MAX_WIDTH;
+      uint8_t y_pos = registers[vy] % MAX_HEIGHT;
 
       std::cout << "The X and y pos are " << +registers[vx] << ',' << +registers[vy] << '\n';
 
-			registers[15] = 0;
+      registers[15] = 0;
       /*
        loop through sprite located at memory held in the index register
        XOR sprite bit with screen bit
        if inital x or y value is not within screen bounds than wrap sprite
        but if during the drawing we exceed the screen bounds than simply clip the sprite
        */
-			for(int row=0; row<height; row++){
-				uint8_t spriteByte = memory[index_register + row];
-				for(int col = 0; col < 8; col++)
-				{
-          if (x_pos+col > MAX_WIDTH) {break;}
-					uint8_t spritepixel = spriteByte & (0x80 >> col); //0x80 = 10000000 shift over by whatever collumn we're on to get current bit needed for screenpixel
-					uint32_t * screenpixel = &video_buffer[(y_pos + row) * MAX_WIDTH + (x_pos + col)];
+     for(int row=0; row<height; row++){
+	uint8_t spriteByte = memory[index_register + row];
+	for(int col = 0; col < 8; col++) {
+          	if (x_pos+col > MAX_WIDTH) {break;}
+			uint8_t spritepixel = spriteByte & (0x80 >> col); //0x80 = 10000000 shift over by whatever collumn we're on to get current bit needed for screenpixel
+			uint32_t * screenpixel = &video_buffer[(y_pos + row) * MAX_WIDTH + (x_pos + col)];
 					// Sprite pixel is on
-				if (spritepixel)
-				{
+		if (spritepixel){
 				// Screen pixel also on - collision
-				if (*screenpixel == 0xFFFFFFFF)
-				{
-					registers[0xF] = 1;
-				}
+			if (*screenpixel == 0xFFFFFFFF){
+				registers[0xF] = 1;
+			}
 
 				// Effectively XOR with the sprite pixel
 				*screenpixel ^= 0xFFFFFFFF;
@@ -88,9 +85,9 @@
 	
 
 
-				}
+	}	
 
-			}
+}
   void CPU::OP_2NNN(){
     //Add current address to the stack and jump to memory location NNN
     ++sp;
@@ -99,7 +96,7 @@
   }
 
   void CPU::OP_00EE(){
-    //Return back to courotine (like a break)
+    //Return back to courotine (like a break) (goes back the stack)
     pc = stack[sp];
     --sp;
   }
@@ -214,39 +211,46 @@
   }
 
   void CPU::OP_FX07(){
+    //VX = delay timer
     uint8_t *VX = &registers[(opcode & 0x0F00) >> 8];
     *VX=timer; 
   }
 
   void CPU::OP_FX15(){
+    //Timer = VX
     uint8_t *VX = &registers[(opcode & 0x0F00) >> 8];
     timer=*VX; 
   }
 
   void CPU::OP_FX18(){
+    //Soundtimer = VX
     uint8_t *VX = &registers[(opcode & 0x0F00) >> 8];
     soundtimer=*VX; 
   }
 
   void CPU::OP_FX1E(){
+    //Index Register += VX
     uint8_t VX = registers[(opcode & 0x0F00) >> 8];
     index_register+=VX;
   }
   
   void CPU::OP_FX29(){
+    //Sets I to the location of Sprite VX is Holding (Ex. VX=6 0x50=starting address of fonts stored in chip8 memory +5(each sprite consists of 5 rows)*6(the sprite)
     uint8_t *VX = &registers[(opcode & 0x0F00) >> 8];
     index_register = 0x50+5*(*VX);
   }
 
   void CPU::OP_FX33(){
+  //Stores the decimal representation of VX starting at index register (Ex. VX=132 ir = 1 ir+1 = 3 ir+2=2)
   uint8_t VX = registers[(opcode & 0x0F00) >> 8];
-  for(int i =0; i<3; i++){
+  for(int i = 0; i<3; i++){
     memory[index_register+2-i] = VX%10;
     VX=VX/10;
   }    
 }
 
 void CPU::OP_FX55(){
+  //Store the value of all registers ranging from (0-value(VX)) starting at the index_register
   uint8_t VX = (opcode & 0x0F00) >> 8;
   for(int i = 0; i<=VX; i++){
     memory[index_register+i] = registers[i];
@@ -254,6 +258,7 @@ void CPU::OP_FX55(){
 }
 
 void CPU::OP_FX65(){
+  //Store the values ranging from (index_register, index_register+value(VX)) into registers
   uint8_t VX = (opcode & 0x0F00) >> 8;
   for(int i = 0; i<=VX; i++){
     registers[i] = memory[index_register+i];
@@ -261,6 +266,7 @@ void CPU::OP_FX65(){
 }
 
 void CPU::OP_EX9E(){
+  //Skip an Instruction if the Key==VX
   uint8_t VX = registers[(opcode & 0xF00) >> 8];
   std::cout << unsigned(key);
   if (key == VX){
@@ -269,6 +275,7 @@ void CPU::OP_EX9E(){
 }
 
 void CPU::OP_EXA1(){
+  //Skip an Instruction if Key!=VX
   uint8_t VX = registers[(opcode & 0xF00) >> 8];
   std::cout << unsigned(key);
   if (key != VX){
@@ -277,6 +284,7 @@ void CPU::OP_EXA1(){
 }
 
 void CPU::OP_FX0A(){
+  //IF a Key is not pressed halt execution of program (comparison to 0xFF because that is the value of key var when no key is pressed)
   uint8_t *VX = &registers[(opcode & 0xF00) >> 8];
   std::cout << unsigned(key);
  if (key == 0xFF){
@@ -329,6 +337,7 @@ void CPU::LoadROM(char const *filename) {
   }
 }
 void CPU::Cycle() {
+  //Obtains 16 byte instruction and determines what opcode it corresponds to 
   opcode = (memory[pc] << 8) | memory[pc + 1];
   pc += 2;
   if (pc > 4096){
