@@ -16,13 +16,20 @@ It's Machine Specifications are as listed below:
 
 The Following Project was therefore created in attempt to gain an understanding over low level concepts such as Opcodes (similar to syscalls), stacks, dealing with memory directly, registers, etc...
 
-4-flags ROM provided by Timendus (integral for testing of mathematical operations)
+4-flags ROM provided by Timendus (integral for testing of mathematical operations):
+
 ![Screenshot_20241020_184000](https://github.com/user-attachments/assets/00344a29-fca4-4a5a-8c31-241ee9a31800)
-3-corax+ ROM provided by Timendus (integral for testing of opcodes)
+
+3-corax+ ROM provided by Timendus (integral for testing of opcodes):
+
 ![Screenshot_20241020_183935](https://github.com/user-attachments/assets/09e9e30f-16fb-4e14-88a7-9e79cca33ac4)
+
 Breakout:
+
 ![Screenshot_20241020_183902](https://github.com/user-attachments/assets/92514e91-189d-42c1-b74b-025f260c41c9)
+
 Tetris:
+
 ![Screenshot_20241020_190016](https://github.com/user-attachments/assets/b3d06a64-2944-4112-9099-4b2b93a06b24)
 
 Dependencies To Build:
