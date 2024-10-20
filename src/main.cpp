@@ -5,12 +5,13 @@
 #include <SDL2/SDL.h>
 
 
-void EmulationLoop(char const *romFilename){
+void EmulationLoop(char const *romFilename, int x, int y){
+
   CPU chip8(romFilename);
-  SDL_Window* window = Initalize_window(1);
+  chip8.LoadROM(romFilename);
+  SDL_Window* window = Initalize_window(x,y);
   SDL_Renderer* renderer = Initalize_Renderer(window);
-  //make this configurable 
-  SDL_RenderSetScale(renderer, 15, 20);
+  SDL_RenderSetScale(renderer, x/64, y/32);
 
   bool quit = false;
   int cycle = 0;
@@ -20,9 +21,12 @@ void EmulationLoop(char const *romFilename){
     quit = GetKey(&chip8.key);
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> elapsed = end-start;
-    if (elapsed.count() > 0.002f){
+
+    if (elapsed.count() > 0.001f){
+
         chip8.Cycle();
         update_screen(window,renderer,chip8.video_buffer);
+
         if (cycle % 8 == 0){
               if (chip8.soundtimer){
                 std::cout << "Soundtimer: " << unsigned(chip8.soundtimer) << '\n';
@@ -33,6 +37,7 @@ void EmulationLoop(char const *romFilename){
                 chip8.timer--;
               }
         }
+
         cycle++;
         start=end;
     }
@@ -41,11 +46,19 @@ void EmulationLoop(char const *romFilename){
 }
 
 int main(int argc, char *argv[]) {
-  if (argc < 2){
-    std::cout << "Missing Filename" << "\n";
+  if (argc < 4){
+    std::cout << "Missing Filename or Resolution" << "\n";
     return -1;
   }
-  EmulationLoop(argv[1]);
-  return 1;
+
+  try {
+    int x = std::stoi(argv[2]);
+    int y = std::stoi(argv[3]);
+  }
+  catch(std::invalid_argument){
+    return -1;
+  }
+    EmulationLoop(argv[1],std::stoi(argv[2]),std::stoi(argv[3]));
+  return 0;
 }
 

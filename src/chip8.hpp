@@ -83,7 +83,7 @@ class CPU{
 		uint16_t index_register;
 		uint16_t pc;
 		uint16_t stack[16];
-		uint8_t sp;
+		uint8_t sp = -1;
 		uint16_t opcode;
     char const* romFilename;
 

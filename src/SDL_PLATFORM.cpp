@@ -2,11 +2,11 @@
 #include <iostream>
 #include <unistd.h>
 
-SDL_Window* Initalize_window(int scale){
+SDL_Window* Initalize_window(int x, int y){
   if(SDL_Init(SDL_INIT_EVERYTHING) != 0){
     std::cout << "Error" << SDL_GetError();
   }
-  return SDL_CreateWindow("Tester",0,0,1920,1080,SDL_WINDOW_SHOWN);
+  return SDL_CreateWindow("Tester",0,0,x,y,SDL_WINDOW_SHOWN);
 }
 
 SDL_Renderer* Initalize_Renderer(SDL_Window* window){

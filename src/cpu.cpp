@@ -93,16 +93,15 @@
 			}
   void CPU::OP_2NNN(){
     //Add current address to the stack and jump to memory location NNN
-    stack[sp] = pc;
     ++sp;
+    stack[sp] = pc;
     pc = (opcode & 0x0FFF);
   }
 
   void CPU::OP_00EE(){
     //Return back to courotine (like a break)
-    stack[sp] = 0x00;
-    --sp;
     pc = stack[sp];
+    --sp;
   }
 
   void CPU::OP_3XNN(){
@@ -167,27 +166,28 @@
     //Add VX+VY if the result is greater than 8bits (255) than set the carry flag to 1 (VF=1) and set VX only equal to the last 8 bits of the addition
     uint8_t *VX = &registers[(opcode & 0x0F00) >> 8];
     uint8_t VY = registers[(opcode & 0x00F0) >> 4];
-    if (*VX+VY > 255) {
-      registers[15] = 1;
-    }
-    else {
-      registers[15] = 0;  
-    }
+    uint8_t shifted = (*VX+VY > 255);
     *VX = (*VX+VY) & 0xFF;
+    registers[15]=shifted;
   }
 
   void CPU::OP_8XY5(){
     //VX =  VX-VY
     uint8_t *VX = &registers[(opcode & 0x0F00) >> 8];
     uint8_t VY = registers[(opcode & 0x00F0) >> 4];
+    uint8_t overflow = *VX>=VY;
+    std::cout << unsigned(*VX) << ':' << unsigned(VY) << ':' << unsigned(overflow) << '\n';
     *VX = *VX-VY;
+    registers[15] = overflow;
   }
 
   void CPU::OP_8XY7(){
     //VX = VY-VX
     uint8_t *VX = &registers[(opcode & 0x0F00) >> 8];
     uint8_t VY = registers[(opcode & 0x00F0) >> 4];
+    uint8_t overflow = VY>=*VX;
     *VX = VY-*VX;
+    registers[15] = overflow; 
   }
 
   void CPU::OP_8XY6(){
@@ -195,21 +195,21 @@
     //Set the VF flag to the bit that was shifted out
     uint8_t *VX = &registers[(opcode & 0x0F00) >> 8];
     uint8_t VY = registers[(opcode & 0x00F0) >> 4];
+    uint8_t bit_shifted = *VX & 0b1;
     *VX=VY;
-    registers[15] = *VX & 0b10000000; 
-    std::cout << unsigned(VY) << ":";
     *VX >>= 1;
-    std::cout << unsigned(*VX) << " ";
+    registers[15] = bit_shifted; 
   }
 
   void CPU::OP_8XYE(){
     //Set VX to VY and shift VX to the left by 1 bit
     uint8_t *VX = &registers[(opcode & 0x0F00) >> 8];
     uint8_t VY = registers[(opcode & 0x00F0) >> 4];
+    uint8_t bit_shifted = (*VX & 0x80) > 0;
     *VX=VY;
-    registers[15] = *VX & 0b10000000; 
     std::cout << unsigned(VY) << ":";
     *VX <<= 1;
+    registers[15] = bit_shifted; 
     std::cout << unsigned(*VX) << " ";
   }
 
@@ -300,7 +300,6 @@ CPU::CPU(const char * filename) {
 
     memory[FONTSET_START_ADDRESS + i] = fontset[i];
   }
-  LoadROM(romFilename);
 }
 
 void CPU::LoadROM(char const *filename) {
@@ -332,6 +331,9 @@ void CPU::LoadROM(char const *filename) {
 void CPU::Cycle() {
   opcode = (memory[pc] << 8) | memory[pc + 1];
   pc += 2;
+  if (pc > 4096){
+    std::cout << "Exceeding size of memory";
+  }
   std::cout << '\n' << pc << ": ";
   switch (opcode & 0xF000) {
   case 0x0000:
