@@ -22,8 +22,6 @@ The Following Project was therefore created in attempt to gain an understanding 
 ![Screenshot_20241020_183935](https://github.com/user-attachments/assets/09e9e30f-16fb-4e14-88a7-9e79cca33ac4)
 Breakout:
 ![Screenshot_20241020_183902](https://github.com/user-attachments/assets/92514e91-189d-42c1-b74b-025f260c41c9)
-Tetris:
-![Screenshot_20241020_190016](https://github.com/user-attachments/assets/b3d06a64-2944-4112-9099-4b2b93a06b24)
 
 Dependencies To Build:
   SDL2 (note currently this program only builds on linux)
