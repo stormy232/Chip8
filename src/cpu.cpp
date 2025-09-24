@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <chrono>
 #include <random>
-#include "chip8.hpp"
+#include "cpu.hpp"
 #include <iostream>
 #include <fstream>
 #include <time.h> 

@@ -1,4 +1,4 @@
-#include "chip8.hpp"
+#include "cpu.hpp"
 #include "SDL_PLATFORM.hpp"
 #include <chrono>
 #include <iostream>
