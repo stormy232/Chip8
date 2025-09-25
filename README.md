@@ -27,9 +27,13 @@ Dependencies To Build:
   SDL2 (note currently this program only builds on linux)
 
 Build Instuctions:
+  Create build directory within root directory cd into it and run cmake
   #####
-    make clean & make
+    mkdir build && cd build && cmake ..
+  Run Make
+  #####
+    make
 
 How to Run Program:
   #####
-    ./main [path_to_rom][width_of_window][height_of_window]
+    ./Chip8 [path_to_rom][width_of_window][height_of_window]
