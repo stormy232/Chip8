@@ -1,0 +1,83 @@
+name: Build and Release Chip8
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags like v1.0, v2.1.3, etc.
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.16.0'
+
+      - name: Install dependencies
+        run: |
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            sudo apt-get update
+            sudo apt-get install -y libsdl2-dev
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            brew install sdl2
+          fi
+        shell: bash
+
+      - name: Configure project
+        run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build project
+        run: cmake --build build --config Release --parallel
+
+      - name: Package executable
+        run: |
+          mkdir -p package
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            cp build/Release/Chip8.exe package/
+            cd package && 7z a ../Chip8-${{ runner.os }}.zip Chip8.exe
+          else
+            cp build/Chip8 package/
+            cd package && tar -czf ../Chip8-${{ runner.os }}.tar.gz Chip8
+          fi
+        shell: bash
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Chip8-${{ runner.os }}
+          path: |
+            Chip8-${{ runner.os }}.zip
+            Chip8-${{ runner.os }}.tar.gz
+          if-no-files-found: ignore
+
+  release:
+    name: Publish Release
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "Chip8 ${{ github.ref_name }}"
+          draft: false
+          prerelease: false
+          files: |
+            artifacts/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
