@@ -3,7 +3,7 @@ name: Build and Release Chip8
 on:
   push:
     tags:
-      - 'v*'  # Triggers on version tags like v1.0.0, v1.1, etc.
+      - 'v*'  # Trigger on tags like v1.0.0
 
 jobs:
   build:
@@ -22,7 +22,7 @@ jobs:
         with:
           cmake-version: '3.25.0'
 
-      # --- Linux build ---
+      # --- Linux Build ---
       - name: Install SDL2 (Linux)
         if: runner.os == 'Linux'
         run: |
@@ -35,7 +35,7 @@ jobs:
           cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel
 
-      # --- Windows build using MSYS2 + MinGW64 ---
+      # --- Windows Build using MSYS2 + MinGW64 ---
       - name: Set up MSYS2 (Windows)
         if: runner.os == 'Windows'
         uses: msys2/setup-msys2@v2
@@ -49,45 +49,50 @@ jobs:
             mingw-w64-x86_64-make
             mingw-w64-x86_64-SDL2
 
-      - name: Configure and Build (Windows)
+      - name: Configure, Build and Package (Windows)
         if: runner.os == 'Windows'
         shell: msys2 {0}
         run: |
+          # Configure and build
           cmake -B build -S . -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel
 
-      # --- Package executables ---
-      - name: Package executable
-        run: |
+          # Make package directory
           mkdir -p package
 
-          if [[ "$RUNNER_OS" == "Windows" ]]; then
-            # Copy the compiled exe
-            cp build/Chip8.exe package/
+          # Copy executable
+          cp build/Chip8.exe package/
 
-            # Find and copy SDL2.dll from the MSYS2 environment
-            DLL_PATH=$(find /mingw64/bin -name "SDL2.dll" | head -n 1)
-            if [ -f "$DLL_PATH" ]; then
-              cp "$DLL_PATH" package/
-              echo "Copied SDL2.dll from $DLL_PATH"
-            else
-              echo "Warning: SDL2.dll not found!"
-            fi
-
-            cd package && 7z a ../Chip8-${{ runner.os }}.zip Chip8.exe SDL2.dll
+          # Copy SDL2.dll from MSYS2 MinGW64 bin
+          if [ -f /mingw64/bin/SDL2.dll ]; then
+            cp /mingw64/bin/SDL2.dll package/
+            echo "Copied SDL2.dll successfully."
           else
-            cp build/Chip8 package/
-            cd package && tar -czf ../Chip8-${{ runner.os }}.tar.gz Chip8
+            echo "Error: SDL2.dll not found!"
+            exit 1
           fi
-        shell: bash
 
-      - name: Upload artifact
+          # Create ZIP including both files
+          cd package
+          7z a ../Chip8-Windows.zip Chip8.exe SDL2.dll
+
+      # --- Package Linux executable ---
+      - name: Package Linux executable
+        if: runner.os == 'Linux'
+        run: |
+          mkdir -p package
+          cp build/Chip8 package/
+          cd package
+          tar -czf ../Chip8-Linux.tar.gz Chip8
+
+      # --- Upload artifacts ---
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: Chip8-${{ runner.os }}
           path: |
-            Chip8-${{ runner.os }}.zip
-            Chip8-${{ runner.os }}.tar.gz
+            Chip8-Windows.zip
+            Chip8-Linux.tar.gz
           if-no-files-found: ignore
 
   release:
