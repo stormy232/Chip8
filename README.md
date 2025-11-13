@@ -24,7 +24,8 @@ Breakout:
 ![Screenshot_20241020_183902](https://github.com/user-attachments/assets/92514e91-189d-42c1-b74b-025f260c41c9)
 
 Dependencies To Build:
-  SDL2 (note currently this program only builds on linux)
+  SDL2 (note currently on windows this program has only been tested with msys2 as of the moment) 
+  Therefore best to install dependencies from there if possible
 
 Build Instuctions:
   Create build directory within root directory cd into it and run cmake
